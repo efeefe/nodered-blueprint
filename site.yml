@@ -1,0 +1,85 @@
+# Ansible Playbook for Subutai Nextcloud blueprint
+---
+
+- hosts: all
+  gather_facts: false
+  remote_user: root
+  tasks: 
+
+    - name: Install tools
+      apt:
+        name: "{{ item }}"
+        state: latest
+      with_items: 
+        - unzip
+        - curl
+        - apt-transport-https
+
+    - name: Configure nodesource repo
+      copy:
+        src: apt/nodesource.list
+        dest: /etc/apt/sources.list.d/
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Add nodesource key
+      raw: wget -qO- https://deb.nodesource.com/gpgkey/nodesource.gpg.key | apt-key add -
+
+- hosts: all
+  remote_user: root
+  tasks: 
+
+    - name: Update repository metadata
+      raw: apt-get update
+
+    - name: Install required debs
+      apt: 
+        name: "{{ item }}"
+        state: latest
+      with_items: 
+        - nodejs
+
+    - name: Download and unzip etherpad
+      unarchive:
+        src: "https://github.com/ether/etherpad-lite/archive/1.6.6.zip"
+        dest: "/tmp"
+        remote_src: yes
+        validate_certs: no
+
+    - name: Clean up
+      file:
+        path: /opt/etherpad
+        state: absent
+
+    - name: Move files
+      command: bash -c "mkdir -p /opt/etherpad && mv /tmp/etherpad*/* /opt/etherpad" 
+
+    - name: Change file ownership
+      file:
+        path: /opt/etherpad
+        recurse: yes
+        owner: root
+        group: root
+
+    - name: Install dependencies
+      raw: bash /opt/etherpad/bin/installDeps.sh --root
+
+    - name: Set up service
+      copy:
+        src: systemd/etherpad.service
+        dest: /etc/systemd/system/
+        owner: root
+        group: root
+        mode: 0644
+
+    - name: Reload systemd
+      raw: systemctl daemon-reload
+
+    - name: Enable service
+      service:
+        name: etherpad
+        enabled: yes
+        state: started
+
+# vim: ts=2 et nowrap autoindent
