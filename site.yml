@@ -67,14 +67,28 @@
     - name: Install Node-RED with unsafe-perm
       raw: npm install -g --unsafe-perm node-red
 
-    - name: Initialize node-red
-      raw: cd /var/lib/nodered && node-red && cd -
-
     - name: Install bcryptjs
       npm: 
         name: bcryptjs
         global: yes
         state: latest
+
+    - name: Copy settings.js
+      copy:
+        src: nodered/settings.js
+        dest: /var/lib/nodered/
+        owner: nodered
+        group: nodered
+        mode: 0644
+
+    - name: Set up admin user
+      raw: sed -i 's/@ADMIN_USER@/{{ adminUser }}/' /var/lib/nodered/settings.js
+
+    - name: Generate password hash
+      raw: export pwd_hash=$(node -e "console.log(require('bcryptjs').hashSync(process.argv[1], 8));" {{ adminPassword }})
+
+    - name: Set up passowrd
+      raw: sed -i "s/@ADMIN_HASH@/$pwd_hash/" /var/lib/nodered/settings.js
     
     - name: Copy service files
       copy:
