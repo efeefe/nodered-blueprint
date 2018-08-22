@@ -98,7 +98,7 @@
         group: root
         mode: 0644
       with_items:
-        - etc/systemd/node-red.service
+        - systemd/node-red.service
 
     - name: Start service
       systemd:
