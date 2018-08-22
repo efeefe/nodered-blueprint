@@ -51,7 +51,7 @@
 
     - name: Set file permissions
       file:
-        dest: {{ item }}
+        dest: "{{ item }}"
         owner: nodered
         group: nodered
         recurse: yes
@@ -78,7 +78,7 @@
     
     - name: Copy service files
       copy:
-        src: {{ item }}
+        src: "{{ item }}"
         dest: /etc/systemd/system/
         owner: root
         group: root
