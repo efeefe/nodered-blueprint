@@ -19,6 +19,11 @@
             ]
         }
     ],
+    "peer-criteria": [
+        {
+            "name": "HTTP-GROUP"
+        }
+    ],
     "ansible-configuration": {
         "source-url": "https://github.com/happyaron/nodered-blueprint/archive/master.zip",
         "ansible-playbook": "site.yml",
