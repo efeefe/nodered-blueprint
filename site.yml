@@ -15,6 +15,7 @@
         - unzip
         - curl
         - apt-transport-https
+        - apache2-utils
 
     - name: Configure nodesource repo
       copy:
@@ -67,12 +68,6 @@
     - name: Install Node-RED with unsafe-perm
       raw: npm install -g --unsafe-perm node-red
 
-    - name: Install bcryptjs
-      npm: 
-        name: bcryptjs
-        global: yes
-        state: latest
-
     - name: Copy settings.js
       copy:
         src: nodered/settings.js
@@ -84,12 +79,9 @@
     - name: Set up admin user
       raw: sed -i 's/@ADMIN_USER@/{{ adminUser }}/' /var/lib/nodered/settings.js
 
-    - name: Generate password hash
-      raw: export pwd_hash=$(node -e "console.log(require('bcryptjs').hashSync(process.argv[1], 8));" {{ adminPassword }})
+    - name: Set up admin password
+      raw: sed -i "s/@ADMIN_HASH@/$(htpasswd -bnBC 8 "" {{ adminPassword }} |tr -d ':\n'|sed 's/$2y/$2a/')/" /var/lib/nodered/settings.js
 
-    - name: Set up passowrd
-      raw: sed -i "s/@ADMIN_HASH@/$pwd_hash/" /var/lib/nodered/settings.js
-    
     - name: Copy service files
       copy:
         src: "{{ item }}"
@@ -105,6 +97,6 @@
         daemon_reload: yes
         name: node-red.service
         enabled: yes
-        state: started
+        state: restarted
 
 # vim: ts=2 et nowrap autoindent
