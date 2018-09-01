@@ -80,7 +80,7 @@
       raw: sed -i 's/@ADMIN_USER@/{{ adminUser }}/' /var/lib/nodered/settings.js
 
     - name: Set up admin password
-      raw: sed -i "s/@ADMIN_HASH@/$(htpasswd -bnBC 8 "" {{ adminPassword }} |tr -d ':\n'|sed 's/$2y/$2a/')/" /var/lib/nodered/settings.js
+      raw: sed -i "s#@ADMIN_HASH@#$(htpasswd -bnBC 8 "" {{ adminPassword }} |tr -d ':\n'|sed 's#$2y#$2a#')#" /var/lib/nodered/settings.js
 
     - name: Copy service files
       copy:
