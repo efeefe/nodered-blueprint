@@ -68,6 +68,12 @@
     - name: Install Node-RED with unsafe-perm
       raw: npm install -g --unsafe-perm node-red
 
+    - name: Install node-red-contrib-influxdb
+      npm: 
+        name: node-red-contrib-influxdb
+        global: yes
+        state: present
+    
     - name: Copy settings.js
       copy:
         src: nodered/settings.js
