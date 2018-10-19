@@ -1,8 +1,8 @@
 {
     "name": "${environmentName}",
     "description": "node-red",
-    "version": "0.19",
-    "author": "https://github.com/happyaron",
+    "version": "0.20",
+    "author": "https://github.com/efeefe",
     "containers": [
         {
             "hostname": "${webContainerName}",
@@ -25,7 +25,7 @@
         }
     ],
     "ansible-configuration": {
-        "source-url": "https://github.com/happyaron/nodered-blueprint/archive/master.zip",
+        "source-url": "https://github.com/efeefe/nodered-blueprint/archive/master.zip",
         "ansible-playbook": "site.yml",
         "extra-vars": [
             {
